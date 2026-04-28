@@ -135,7 +135,7 @@ NET=$(ip route get 8.8.8.8 2>/dev/null | awk '{for(i=1;i<=NF;i++) if ($i=="dev")
 NET=${NET:-eth0}
 
 clear
-REPO="https://raw.githubusercontent.com/xyzstore/new8/main/"
+REPO="https://raw.githubusercontent.com/xyzstore/new8/master/"
 start=$(date +%s)
 secs_to_human() {
 echo "Installation time : $((${1} / 3600)) hours $(((${1} / 60) % 60)) minute's $((${1} % 60)) seconds"

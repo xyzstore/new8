@@ -30,7 +30,7 @@ apt update -y && apt upgrade -y --fix-missing && apt install --reinstall wget cu
 ### 3. Install Script
 
 ```bash
-screen -S setup-session bash -c "wget -q https://raw.githubusercontent.com/xyzstore/new8/main/install.sh && chmod +x install.sh && ./install.sh"
+screen -S setup-session bash -c "wget -q https://raw.githubusercontent.com/xyzstore/new8/master/install.sh && chmod +x install.sh && ./install.sh"
 ```
 ---
 
@@ -49,7 +49,7 @@ screen -r -d setup-session
 Untuk melakukan update ke versi terbaru, gunakan:
 
 ```bash
-wget https://raw.githubusercontent.com/xyzstore/new8/main/update.sh && chmod +x update.sh && ./update.sh
+wget https://raw.githubusercontent.com/xyzstore/new8/master/update.sh && chmod +x update.sh && ./update.sh
 ```
 
 ---
