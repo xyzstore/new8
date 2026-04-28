@@ -66,9 +66,9 @@ res13() {
     systemctl restart squid
 }
 res14() {
-    systemctl restart badvpn1
-    systemctl restart badvpn2
-    systemctl restart badvpn3
+    systemctl is-enabled badvpn1 &>/dev/null && systemctl restart badvpn1
+    systemctl is-enabled badvpn2 &>/dev/null && systemctl restart badvpn2
+    systemctl is-enabled badvpn3 &>/dev/null && systemctl restart badvpn3
 }
 netfilter-persistent
 clear

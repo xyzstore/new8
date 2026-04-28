@@ -4,7 +4,7 @@ GREEN='\033[0;36m'
 YELLOW='\033[0;33m'
 RED='\033[0;31m'
 CRON_FILE="/etc/cron.d/ari-autoupdate"
-UPDATE_CMD='wget -q https://raw.githubusercontent.com/xyzstore/new8/main/update.sh -O /tmp/ari-update.sh && chmod +x /tmp/ari-update.sh && /tmp/ari-update.sh >/var/log/ari-autoupdate.log 2>&1'
+UPDATE_CMD='wget -q https://raw.githubusercontent.com/xyzstore/new8/master/update.sh -O /tmp/ari-update.sh && chmod +x /tmp/ari-update.sh && /tmp/ari-update.sh >/var/log/ari-autoupdate.log 2>&1'
 MODE_FILE="/etc/ari-ui-mode"
 [ -f "$MODE_FILE" ] && UI_MODE="$(cat "$MODE_FILE")" || UI_MODE="full"
 

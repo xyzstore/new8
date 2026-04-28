@@ -76,7 +76,7 @@ setup_bot() {
     # === Extract API Files ===
     if [ ! -f /usr/bin/api-ari/api.js ]; then
         echo -e "${blue}ðŸ“ Downloading API-ARI package...${neutral}"
-        curl -sL "https://raw.githubusercontent.com/xyzstore/new8/main/limit/api-ari.zip" -o /usr/bin/api-ari.zip
+        curl -sL "https://raw.githubusercontent.com/xyzstore/new8/master/limit/api-ari.zip" -o /usr/bin/api-ari.zip
         cd /usr/bin && unzip api-ari.zip >/dev/null 2>&1
         rm api-ari.zip* && chmod +x api-ari/* && cd
     fi

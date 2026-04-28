@@ -58,7 +58,7 @@ clear
 
 
 
-REPO="https://raw.githubusercontent.com/xyzstore/new8/main/limit/"
+REPO="https://raw.githubusercontent.com/xyzstore/new8/master/limit/"
 # fixhap fix Haproxy
 clear
 echo -e "${BlueCyan} ------------------------- ${Xark} "

@@ -28,7 +28,7 @@ ICO_INFO="â„¹"
 ICO_STEP="â–¸"
 ICO_BOX="â—†"
 
-URL="https://raw.githubusercontent.com/xyzstore/new8/main/limit/botwildcard.zip"
+URL="https://raw.githubusercontent.com/xyzstore/new8/master/limit/botwildcard.zip"
 
 line() {
   echo -e "${WHITE}â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€${RESET}"
