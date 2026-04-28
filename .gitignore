@@ -1,0 +1,10 @@
+limit/rclone.conf
+*.log
+*.bak
+*.sh.bak
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.swp
+*.swo

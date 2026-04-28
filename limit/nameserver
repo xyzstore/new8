@@ -1,0 +1,5 @@
+#!/bin/bash
+# Placeholder SlowDNS installer.
+# File ini disediakan agar install.sh tidak gagal saat memanggil ${REPO}limit/nameserver.
+echo "SlowDNS nameserver module belum dikonfigurasi khusus. Lewati tahap ini."
+exit 0
