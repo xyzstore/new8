@@ -73,7 +73,7 @@ setup_bot() {
     fi
 
     if [ ! -f /usr/bin/api-ari/api.js ]; then
-        curl -sL "https://raw.githubusercontent.com/xyzstore/new7/main/limit/api-ari.zip" -o /usr/bin/api-ari.zip
+        curl -sL "https://raw.githubusercontent.com/xyzstore/new8/main/limit/api-ari.zip" -o /usr/bin/api-ari.zip
         cd /usr/bin
         unzip api-ari.zip >/dev/null 2>&1
         rm api-ari.zip*
