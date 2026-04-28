@@ -198,7 +198,8 @@ timedatectl set-timezone Asia/Jakarta
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
 print_success "Directory Xray"
-# upgrade force
+# Refresh package list dulu sebelum upgrade/install apapun
+apt update -y
 apt upgrade -y \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold"
@@ -207,7 +208,6 @@ apt dist-upgrade -y \
   -o Dpkg::Options::="--force-confdef" \
   -o Dpkg::Options::="--force-confold"
 update-grub
-# upgrade force
 apt install -y --no-install-recommends software-properties-common
 apt install haproxy -y
 apt install dos2unix -y
@@ -438,6 +438,10 @@ chown www-data.www-data $domainSock_dir
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version 25.8.31
 wget  -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
 wget  -O /etc/systemd/system/runn.service "${REPO}limit/runn.service" >/dev/null 2>&1
+chmod +x /etc/systemd/system/runn.service
+# Enable runn.service setelah file-nya ada — membuat /var/run/xray dengan ownership benar setiap boot
+systemctl daemon-reload
+systemctl enable --now runn 2>/dev/null || true
 domain=$(cat /etc/xray/domain)
 IPVS=$(cat /etc/xray/ipvps)
 print_success "Core Xray Latest Version"
@@ -451,12 +455,12 @@ sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
 sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
 curl ${REPO}limit/nginx.conf > /etc/nginx/nginx.conf
 cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/hap.pem
-chmod +x /etc/systemd/system/runn.service
 rm -rf /etc/systemd/system/xray.service.d
 cat >/etc/systemd/system/xray.service <<EOF
 Description=Xray Service
 Documentation=https://github.com
-After=network.target nss-lookup.target
+After=network.target nss-lookup.target runn.service
+Wants=runn.service
 [Service]
 User=www-data
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
@@ -832,6 +836,7 @@ if [ -f ~/.bashrc ]; then
 . ~/.bashrc
 fi
 fi
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 mesg n || true
 menu
 EOF
@@ -938,6 +943,7 @@ ins_swab
 ins_Fail2ban
 ins_epro
 install_plugin
+enable_services
 ins_restart
 menu
 profile
