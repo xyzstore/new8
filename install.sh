@@ -910,6 +910,9 @@ systemctl restart nginx
 systemctl restart xray
 systemctl restart cron
 systemctl restart haproxy
+# Pastikan /etc/profile tidak crash saat botapi.conf belum ada.
+# Ganti bare "source /etc/botapi.conf" dengan guard yang aman.
+sed -i 's|^source /etc/botapi\.conf$|[ -f /etc/botapi.conf ] \&\& source /etc/botapi.conf|' /etc/profile
 print_success "Enable Service"
 clear
 }

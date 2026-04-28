@@ -103,7 +103,8 @@ setup_bot() {
 
     echo "export KEYAPI=\"$BOT_TOKEN\"" >/etc/botapi.conf
     echo "export CHATID=\"$CHAT_ID\"" >>/etc/botapi.conf
-    grep -q "botapi.conf" /etc/profile || echo "source /etc/botapi.conf" >> /etc/profile
+    # Tambahkan ke /etc/profile dengan guard supaya tidak crash jika file dihapus
+    grep -q "botapi.conf" /etc/profile || echo '[ -f /etc/botapi.conf ] && source /etc/botapi.conf' >> /etc/profile
     source /etc/botapi.conf
 
     MESSAGE="ðŸš€ *api-ari Installed Successfully* ðŸš€

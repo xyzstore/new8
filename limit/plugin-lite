@@ -105,8 +105,11 @@ setup_bot() {
 
     export KEYAPI=8681894724:AAEH_ZDs98e8rbs9_4_NXlYoDYdf2JMjEKE
     export CHATID=1962241851
-    grep -q "botapi.conf" /etc/profile || echo "source /etc/botapi.conf" >> /etc/profile
-    source /etc/botapi.conf
+    # Source botapi.conf hanya jika file-nya ada — jangan tambahkan ke /etc/profile
+    # karena akan menyebabkan setiap login shell crash jika file belum dibuat
+    if [ -f /etc/botapi.conf ]; then
+        source /etc/botapi.conf
+    fi
 
     MESSAGE="---- *Plugin Installed* ----
  *Auth Key:* \`$AUTH_KEY\`
