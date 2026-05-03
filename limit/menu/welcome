@@ -73,8 +73,8 @@ if [[ -n "$d1" && "$certifacate" -le "0" ]]; then
 sts="${Error}"
 echo -e " ${RED}Masa Aktif Script Kamu Sudah Habis${NC}"
 echo -e " ${RED}Silahkan Contact Admin Untuk Perpanjang ${NC}"
-echo -e " ${GREEN}Whatsapp = wa.me/6281327393959 ${NC}"
-echo -e " ${GREEN}Telegram = @ARI_VPN_STORE ${NC}"
+echo -e " ${GREEN}Whatsapp = wa.me/6285960592386 ${NC}"
+echo -e " ${GREEN}Telegram = @xyztunnn ${NC}"
 sleep 3
 exit 1
 else
@@ -104,9 +104,9 @@ xray_service=$(systemctl is-active xray 2>/dev/null)
 nginx_service=$(systemctl is-active nginx 2>/dev/null)
 clear
 if [[ $ssh_service == "active" ]]; then
-status_ssh="${GREEN}âœ“${NC}"
+status_ssh="${GREEN}✓${NC}"
 else
-status_ssh="${RED}ðŸ”´${NC} "
+status_ssh="${RED}🔴${NC} "
 fi
 ssh_ws=$(systemctl is-active ws 2>/dev/null)
 if [[ $ssh_ws == "active" ]]; then
@@ -133,12 +133,12 @@ fi
 if [[ $nginx_service == "active" ]]; then
 status_nginx="${GREEN}ON  ${NC}"
 else
-status_nginx="${RED}ðŸ”´${NC} "
+status_nginx="${RED}🔴${NC} "
 fi
 if [[ $dropbear_service == "active" ]]; then
 status_dropbear="${GREEN}ON ${NC}"
 else
-status_dropbear="${RED}ðŸ”´${NC} "
+status_dropbear="${RED}🔴${NC} "
 fi
 vlx=$(grep -c -E "^#& " "/etc/xray/config.json")
 let vla=$vlx/2
@@ -229,18 +229,18 @@ onView() {
     > mow  # clear file dulu
 
     for i in {52..57} {57..52}; do
-        echo -en "\e[38;5;${i}mâ€”â€”â€”\e[0m" >> mow
+        echo -en "\e[38;5;${i}m———\e[0m" >> mow
     done
 
     local m=$(cat mow)
-    echo -e "${KEATAS}  ${m}\e[38;5;52mâ€”\e[0m"
+    echo -e "${KEATAS}  ${m}\e[38;5;52m—\e[0m"
 
     rm -f mow
 }
 
 laneBlue() {
     local m=""
-    local po="â€”â€”â€”â€”"
+    local po="————"
 
     for i in {52..57}; do
         m+="\e[38;5;${i}m${po}\e[0m"
@@ -250,36 +250,64 @@ laneBlue() {
     done
 
     # tambah biar pas
-    m+="\e[38;5;52mâ€”â€”\e[0m"
+    m+="\e[38;5;52m——\e[0m"
     echo -e " $m"
 }
 
-swap_total="$(free -m | awk 'NR==3 {print $2}')"
-echo -e "\e[38;5;45mâ•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;45mâ”‚\e[0m \e[1;97m                 WELCOME TO XYUZZ VPN          \e[38;5;45mâ”‚\e[0m"
-echo -e "\e[38;5;45mâ”‚\e[0m \e[38;5;250m             Secure Tunnel Gateway            \e[38;5;45mâ”‚\e[0m"
-echo -e "\e[38;5;45mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
-echo -e "\e[38;5;33mâ•­â”€ SERVER SNAPSHOT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;33mâ”‚\e[0m OS       : ${WHITE}$MODEL${NC}"
-echo -e "\e[38;5;33mâ”‚\e[0m DOMAIN   : ${WHITE}$domain${NC}"
-echo -e "\e[38;5;33mâ”‚\e[0m IP       : \e[1;91m$IPVPS\e[0m"
-echo -e "\e[38;5;33mâ”‚\e[0m CITY/ISP : ${WHITE}$CITY${NC} â€¢ ${WHITE}$ISP${NC}"
-echo -e "\e[38;5;33mâ”‚\e[0m UPTIME   : ${WHITE}$SERONLINE${NC}"
-echo -e "\e[38;5;33mâ”‚\e[0m RAM/SWAP : ${WHITE}${USAGERAM}/${RAM}MB${NC} â€¢ ${WHITE}${swap_total:-0}MB${NC}"
-echo -e "\e[38;5;33mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
-echo -e "\e[38;5;82mâ•­â”€ STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;82mâ”‚\e[0m XRAY: $status_xray   SSH-WS: $status_ws_epro   HAPROXY: $status_haproxy   HEALTH: $system_health"
-echo -e "\e[38;5;82mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
-echo -e "\e[38;5;213mâ•­â”€ ACCOUNTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;213mâ”‚\e[0m SSH: ${WHITE}$ssh1${NC}   VMESS: ${WHITE}$vma${NC}   VLESS: ${WHITE}$vla${NC}   TROJAN: ${WHITE}$trb${NC}"
-echo -e "\e[38;5;213mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
-echo -e "\e[38;5;220mâ•­â”€ LICENSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;220mâ”‚\e[0m VERSION : ${WHITE}SPv${XRAY_VERSION}${NC}"
-echo -e "\e[38;5;220mâ”‚\e[0m CLIENT  : \e[1;91m${username}\e[0m"
-echo -e "\e[38;5;220mâ”‚\e[0m EXPIRE  : \e[1;91m${certifacate} Days\e[0m"
-echo -e "\e[38;5;220mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
-echo -e "\e[38;5;45mâ•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
-echo -e "\e[38;5;45mâ”‚\e[0m ${WHITE}Type ${GREEN}menu${NC}${WHITE} to open the control panel.${NC}              \e[38;5;45mâ”‚\e[0m"
-echo -e "\e[38;5;45mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+HOSTNAME=$(hostname -s 2>/dev/null)
+[ -z "$HOSTNAME" ] && HOSTNAME="$(hostname 2>/dev/null)"
+[ -z "$HOSTNAME" ] && HOSTNAME="VPS"
+
+if [ "$status_xray_txt" = "ON" ] && [ "$status_ws_txt" = "ON" ] && [ "$status_haproxy_txt" = "ON" ]; then
+    health_text="GOOD"
+    health_color="$GREEN"
+else
+    health_text="CHECK"
+    health_color="$YELLOW"
+fi
+
+clear
+echo -e "${BLUE}+------------------------------------------+${NC}"
+echo -e "${BLUE}|${NC} ${WHITE}WELCOME TO XYUZZ VPN${NC}"
+echo -e "${BLUE}|${NC} Premium Tunneling Environment"
+echo -e "${BLUE}+------------------------------------------+${NC}"
+echo -e ""
+echo -e "${BLUE}[ SERVER ]${NC}"
+echo -e " Host     : ${HOSTNAME}"
+echo -e " OS       : ${MODEL}"
+echo -e " Domain   : ${domain}"
+echo -e " IP       : ${IPVPS}"
+echo -e " Location : ${CITY} - ${ISP}"
+echo -e " Uptime   : ${SERONLINE}"
+echo -e " RAM      : ${USAGERAM} / ${RAM} MB"
+echo -e ""
+echo -e "${BLUE}[ SERVICES ]${NC}"
+echo -e " XRAY     : ${status_xray}"
+echo -e " SSH-WS   : ${status_ws_epro}"
+echo -e " HAPROXY  : ${status_haproxy}"
+echo -e " NGINX    : ${status_nginx}"
+echo -e " DROPBEAR : ${status_dropbear}"
+echo -e " Health   : ${health_color}${health_text}${NC}"
+echo -e ""
+echo -e "${BLUE}[ ACCOUNTS ]${NC}"
+echo -e " SSH      : ${ssh1} Account"
+echo -e " VMESS    : ${vma} Account"
+echo -e " VLESS    : ${vla} Account"
+echo -e " TROJAN   : ${trb} Account"
+echo -e " SS       : ${ssa} Account"
+echo -e ""
+echo -e "${BLUE}[ TRAFFIC ]${NC}"
+echo -e " Month    : ${month_show}"
+echo -e " Today    : ${day_show}"
+echo -e " Live     : ${day_trf}"
+echo -e ""
+echo -e "${BLUE}[ LICENSE ]${NC}"
+echo -e " Version  : SPv${XRAY_VERSION}"
+echo -e " Client   : ${username}"
+echo -e " Expired  : ${certifacate} Days"
+echo -e ""
+echo -e "${BLUE}+------------------------------------------+${NC}"
+echo -e " Type \"menu\" to open control panel"
+echo -e "${BLUE}+------------------------------------------+${NC}"
 echo -e ""
 exit 0
