@@ -33,13 +33,17 @@ fun_bar() {
     tput cnorm
 }
 res1() {
-rm -f menu.zip
-wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new8/main/limit/menu.zip
-7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
-chmod +x menu/*
-mv -f menu/* /usr/local/sbin/
-cat >/root/.profile <<'EOF'
+    rm -f menu.zip
+    wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new8/master/limit/menu.zip
+    7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
+    chmod +x menu/*
+    mv -f menu/* /usr/local/sbin/
+    dos2unix /usr/local/sbin/install-plugin 2>/dev/null
+
+    cat >/root/.profile <<'EOF'
 # ~/.profile: executed by Bourne-compatible login shells.
+
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
 
 if [ "$BASH" ]; then
     if [ -f /usr/local/sbin/welcome ]; then
@@ -50,9 +54,9 @@ if [ "$BASH" ]; then
 fi
 EOF
 
-chmod 644 /root/.profile
-dos2unix /usr/local/sbin/install-plugin 2>/dev/null
-rm -rf menu menu.zip update.sh
+    chmod 644 /root/.profile
+
+    rm -rf menu menu.zip update.sh
 }
 netfilter-persistent
 clear
