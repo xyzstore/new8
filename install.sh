@@ -829,43 +829,54 @@ dos2unix /usr/local/sbin/install-plugin 2>/dev/null
 rm -rf menu menu.zip update.sh
 }
 function profile(){
-clear
-cat >/root/.profile <<EOF
+    clear
+
+    cat >/root/.profile <<'EOF'
+# ~/.profile: executed by Bourne-compatible login shells.
+
 if [ "$BASH" ]; then
-if [ -f ~/.bashrc ]; then
-. ~/.bashrc
+    if [ -f /usr/local/sbin/welcome ]; then
+        /usr/local/sbin/welcome
+    elif [ -f /usr/local/sbin/menu ]; then
+        /usr/local/sbin/menu
+    fi
 fi
-fi
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-mesg n || true
-menu
 EOF
-cat >/etc/cron.d/xp_all <<-END
+
+    chmod 644 /root/.profile
+
+    cat >/etc/cron.d/xp_all <<-END
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 2 0 * * * root /usr/local/sbin/xp
 END
-cat >/etc/cron.d/logclean <<-END
+
+    cat >/etc/cron.d/logclean <<-END
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 */20 * * * * root /usr/local/sbin/clearlog
 END
-chmod 644 /root/.profile
-cat >/etc/cron.d/daily_reboot <<-END
+
+    cat >/etc/cron.d/daily_reboot <<-END
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 0 3 * * * root /sbin/reboot
 END
-echo "*/1 * * * * root echo -n > /var/log/nginx/access.log" >/etc/cron.d/log.nginx
-echo "*/1 * * * * root echo -n > /var/log/xray/access.log" >>/etc/cron.d/log.xray
-service cron restart
-cat >/home/daily_reboot <<-END
+
+    echo "*/1 * * * * root echo -n > /var/log/nginx/access.log" >/etc/cron.d/log.nginx
+    echo "*/1 * * * * root echo -n > /var/log/xray/access.log" >>/etc/cron.d/log.xray
+
+    service cron restart
+
+    cat >/home/daily_reboot <<-END
 3
 END
-cat >/etc/systemd/system/rc-local.service <<EOF
+
+    cat >/etc/systemd/system/rc-local.service <<-END
 [Unit]
 Description=/etc/rc.local
 ConditionPathExists=/etc/rc.local
+
 [Service]
 Type=forking
 ExecStart=/etc/rc.local start
@@ -873,27 +884,30 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
+
 [Install]
 WantedBy=multi-user.target
-EOF
+END
 
-echo "/bin/false" >>/etc/shells
-echo "/usr/sbin/nologin" >>/etc/shells
-cat >/etc/rc.local <<EOF
+    echo "/bin/false" >>/etc/shells
+    echo "/usr/sbin/nologin" >>/etc/shells
+
+    cat >/etc/rc.local <<-EOF
 #!/bin/sh -e
 # rc.local
-# By default this script does nothing.
+
 iptables -I INPUT -p udp --dport 5300 -j ACCEPT
-# Redirect DNS ke SlowDNS hanya jika service-nya benar-benar running,
-# supaya DNS sistem tidak mati saat boot jika SlowDNS belum aktif.
-if systemctl is-active --quiet slowdns 2>/dev/null; then
+
+if command -v dnsmasq >/dev/null 2>&1; then
+    systemctl restart dnsmasq
     iptables -t nat -I PREROUTING -p udp --dport 53 -j REDIRECT --to-ports 5300
 fi
+
 exit 0
 EOF
 
     chmod +x /etc/rc.local
-    
+
     AUTOREB=$(cat /home/daily_reboot)
     SETT=11
     if [ $AUTOREB -gt $SETT ]; then
@@ -901,7 +915,8 @@ EOF
     else
         TIME_DATE="AM"
     fi
-print_success "Menu Packet"
+
+    print_success "Menu Packet"
 }
 function enable_services(){
 clear
@@ -991,6 +1006,6 @@ secs_to_human "$(($(date +%s) - ${start}))"
 sudo hostnamectl set-hostname $username
 echo -e "${green} Script Successfull Installed"
 echo ""
-echo -e "Menu akan dibuka..."
+echo -e "Welcome akan dibuka..."
 sleep 2
-/usr/local/sbin/menu
+/usr/local/sbin/welcome
