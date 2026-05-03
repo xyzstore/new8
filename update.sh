@@ -33,12 +33,30 @@ fun_bar() {
     tput cnorm
 }
 res1() {
-    rm -f menu.zip
-    wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new8/master/limit/menu.zip
-    7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
-    chmod +x menu/*
-    mv -f menu/* /usr/local/sbin/
-    dos2unix /usr/local/sbin/install-plugin 2>/dev/null
+    clear
+    echo -e "Updating menu from GitHub folder..."
+
+    rm -rf /tmp/new8-master /tmp/new8.zip
+
+    apt install -y unzip curl dos2unix >/dev/null 2>&1
+
+    curl -L -o /tmp/new8.zip https://github.com/xyzstore/new8/archive/refs/heads/master.zip
+
+    if [ ! -s /tmp/new8.zip ]; then
+        echo "Gagal download GitHub archive."
+        exit 1
+    fi
+
+    unzip -o /tmp/new8.zip -d /tmp >/dev/null 2>&1
+
+    if [ ! -d /tmp/new8-master/limit/menu ]; then
+        echo "Folder menu tidak ditemukan di GitHub archive."
+        exit 1
+    fi
+
+    chmod +x /tmp/new8-master/limit/menu/*
+    cp -f /tmp/new8-master/limit/menu/* /usr/local/sbin/
+    dos2unix /usr/local/sbin/* 2>/dev/null
 
     cat >/root/.profile <<'EOF'
 # ~/.profile: executed by Bourne-compatible login shells.
@@ -46,9 +64,9 @@ res1() {
 export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
 
 if [ "$BASH" ]; then
-    if [ -f /usr/local/sbin/welcome ]; then
+    if [ -x /usr/local/sbin/welcome ]; then
         /usr/local/sbin/welcome
-    elif [ -f /usr/local/sbin/menu ]; then
+    elif [ -x /usr/local/sbin/menu ]; then
         /usr/local/sbin/menu
     fi
 fi
@@ -56,7 +74,9 @@ EOF
 
     chmod 644 /root/.profile
 
-    rm -rf menu menu.zip update.sh
+    rm -rf /tmp/new8-master /tmp/new8.zip update.sh
+
+    echo -e "Update menu selesai."
 }
 netfilter-persistent
 clear
