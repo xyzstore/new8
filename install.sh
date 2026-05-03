@@ -818,15 +818,29 @@ rm -f /root/cert.pem
 print_success "All Packet"
 }
 function menu(){
-clear
-print_install "Memasang Menu Packet"
-rm -f menu.zip
-wget  ${REPO}limit/menu.zip
-7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
-chmod +x menu/*
-mv -f menu/* /usr/local/sbin/
-dos2unix /usr/local/sbin/install-plugin 2>/dev/null
-rm -rf menu menu.zip update.sh
+    clear
+    print_install "Installing Menu Packet"
+
+    rm -rf /tmp/new8-master /tmp/new8.zip
+
+    apt install -y unzip curl >/dev/null 2>&1
+
+    curl -L -o /tmp/new8.zip https://github.com/xyzstore/new8/archive/refs/heads/master.zip
+    unzip -o /tmp/new8.zip -d /tmp >/dev/null 2>&1
+
+    if [ ! -d /tmp/new8-master/limit/menu ]; then
+        echo "Folder menu tidak ditemukan di GitHub archive."
+        exit 1
+    fi
+
+    chmod +x /tmp/new8-master/limit/menu/*
+    cp -f /tmp/new8-master/limit/menu/* /usr/local/sbin/
+
+    dos2unix /usr/local/sbin/* 2>/dev/null
+
+    rm -rf /tmp/new8-master /tmp/new8.zip
+
+    print_success "Menu Packet"
 }
 function profile(){
     clear
