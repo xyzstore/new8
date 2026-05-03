@@ -329,9 +329,82 @@ m-bkp
 clear
 wget https://rajaserver.web.id/v7/udp-custom.sh && chmod +x udp-custom.sh && ./udp-custom.sh && rm udp-custom.sh
 ;;
-8 | 08) 
+8 | 08)
 clear
-nano /etc/issue.net
+echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "        CHANGE SSH BANNER"
+echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "1. Edit plain text"
+echo -e "2. Paste HTML, auto convert ke SSH banner"
+echo -e "3. Buat banner HTML untuk web"
+echo -e "0. Kembali"
+echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+read -p "Pilih menu: " banner_menu
+
+case "$banner_menu" in
+    1)
+        nano /etc/issue.net
+        systemctl restart ssh 2>/dev/null || systemctl restart sshd
+        ;;
+
+    2)
+        tmp_html="/tmp/banner_input.html"
+        tmp_txt="/tmp/banner_output.txt"
+
+        clear
+        echo -e "Paste HTML banner kamu di sini."
+        echo -e "Kalau sudah selesai:"
+        echo -e "CTRL + O, Enter, CTRL + X"
+        sleep 2
+
+        nano "$tmp_html"
+
+        sed \
+            -e 's/<br[[:space:]]*\/\?>/\n/gi' \
+            -e 's/<\/p>/\n/gi' \
+            -e 's/<\/div>/\n/gi' \
+            -e 's/<\/h[1-6]>/\n/gi' \
+            -e 's/<[^>]*>//g' \
+            -e 's/&nbsp;/ /g' \
+            -e 's/&amp;/\&/g' \
+            -e 's/&lt;/</g' \
+            -e 's/&gt;/>/g' \
+            "$tmp_html" > "$tmp_txt"
+
+        awk 'NF {blank=0; print; next} !blank {print; blank=1}' "$tmp_txt" > /etc/issue.net
+
+        systemctl restart ssh 2>/dev/null || systemctl restart sshd
+
+        echo -e ""
+        echo -e "Banner HTML berhasil dikonversi ke SSH banner."
+        read -n 1 -s -r -p "Tekan Enter untuk kembali..."
+        ;;
+
+    3)
+        clear
+        echo -e "Paste HTML banner untuk web."
+        echo -e "File akan disimpan ke /var/www/html/banner.html"
+        echo -e "Kalau selesai: CTRL + O, Enter, CTRL + X"
+        sleep 2
+
+        nano /var/www/html/banner.html
+        chmod 644 /var/www/html/banner.html
+
+        echo -e ""
+        echo -e "Banner HTML web berhasil dibuat:"
+        echo -e "https://$(cat /etc/xray/domain 2>/dev/null):81/banner.html"
+        read -n 1 -s -r -p "Tekan Enter untuk kembali..."
+        ;;
+
+    0)
+        menu
+        ;;
+
+    *)
+        echo "Pilihan tidak valid"
+        sleep 1
+        ;;
+esac
 ;;
 9 | 09)
 clear
