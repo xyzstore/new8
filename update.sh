@@ -34,7 +34,7 @@ fun_bar() {
 }
 res1() {
 rm -f menu.zip
-wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new7/main/limit/menu.zip
+wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new8/main/limit/menu.zip
 7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
 chmod +x menu/*
 mv -f menu/* /usr/local/sbin/
