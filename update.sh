@@ -38,6 +38,19 @@ wget -O menu.zip https://raw.githubusercontent.com/xyzstore/new8/main/limit/menu
 7z x menu.zip -p'coding_sendiri_lah_goblok_cuman_bisa_nyuri'
 chmod +x menu/*
 mv -f menu/* /usr/local/sbin/
+cat >/root/.profile <<'EOF'
+# ~/.profile: executed by Bourne-compatible login shells.
+
+if [ "$BASH" ]; then
+    if [ -f /usr/local/sbin/welcome ]; then
+        /usr/local/sbin/welcome
+    elif [ -f /usr/local/sbin/menu ]; then
+        /usr/local/sbin/menu
+    fi
+fi
+EOF
+
+chmod 644 /root/.profile
 dos2unix /usr/local/sbin/install-plugin 2>/dev/null
 rm -rf menu menu.zip update.sh
 }
