@@ -834,6 +834,8 @@ function profile(){
     cat >/root/.profile <<'EOF'
 # ~/.profile: executed by Bourne-compatible login shells.
 
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+
 if [ "$BASH" ]; then
     if [ -f /usr/local/sbin/welcome ]; then
         /usr/local/sbin/welcome
@@ -843,7 +845,7 @@ if [ "$BASH" ]; then
 fi
 EOF
 
-    chmod 644 /root/.profile
+chmod 644 /root/.profile
 
     cat >/etc/cron.d/xp_all <<-END
 SHELL=/bin/sh
