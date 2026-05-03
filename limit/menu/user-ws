@@ -1,96 +1,223 @@
 #!/bin/bash
+
 clear
 
-PUB=$(cat /etc/slowdns/server.pub)
-NS=$(cat /etc/xray/dns)
-CITY=$(cat /etc/xray/city)
-clear
-NUMBER_OF_CLIENTS=$(grep -c -E "^### " "/etc/xray/config.json")
-        if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
-    echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e " \e[1;97;101m         CONFIG VMESS ACCOUNT           \e[0m"
-    echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+# =========================
+# CONFIG VMESS ACCOUNT
+# Fixed:
+# - List user tidak dobel lagi
+# - Tidak lagi manggil command "vmess"
+# - Pakai /etc/vmess/.vmess.db sebagai sumber utama
+# - Link VMess dibuat sebelum file OpenClash ditulis
+# =========================
+
+NC='\e[0m'
+CYAN='\033[1;36m'
+BLUE='\033[0;34m'
+WHITE='\033[1;37m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+
+DB_FILE="/etc/vmess/.vmess.db"
+DOMAIN_FILE="/etc/xray/domain"
+DNS_FILE="/etc/xray/dns"
+PUB_FILE="/etc/slowdns/server.pub"
+CITY_FILE="/etc/xray/city"
+
+back_to_vmess() {
+    if command -v m-vmess >/dev/null 2>&1; then
+        m-vmess
+    elif [ -x /usr/local/sbin/m-vmess ]; then
+        /usr/local/sbin/m-vmess
+    elif command -v menu >/dev/null 2>&1; then
+        menu
+    elif [ -x /usr/local/sbin/menu ]; then
+        /usr/local/sbin/menu
+    else
+        exit 0
+    fi
+}
+
+pause_back() {
     echo ""
-    echo "You have no existing clients!"
+    read -n 1 -s -r -p "Press [ Enter ] to back on menu"
+    back_to_vmess
+}
+
+b64_encode() {
+    if base64 --help 2>&1 | grep -q -- '-w'; then
+        printf '%s' "$1" | base64 -w 0
+    else
+        printf '%s' "$1" | base64 | tr -d '\n'
+    fi
+}
+
+line() {
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
+
+header() {
+    clear
+    line
+    echo -e " ${WHITE}\e[1;97;101m CONFIG VMESS ACCOUNT \e[0m"
+    line
+}
+
+safe_cat() {
+    local file="$1"
+    local default="$2"
+
+    if [ -f "$file" ]; then
+        cat "$file"
+    else
+        echo "$default"
+    fi
+}
+
+header
+
+if [ ! -s "$DB_FILE" ]; then
     echo ""
-    echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    read -n 1 -s -r -p "Press [ Enter ] to back on menu vmess"
-    vmess
+    echo -e "${RED}You have no existing clients!${NC}"
+    echo ""
+    line
+    pause_back
 fi
 
-  echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-  echo -e "  \e[1;97;101m        CONFIG VMESS ACCOUNT         \E[0m"
-  echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-        echo "     No  Expired   User"
-        grep -E "^### " "/etc/xray/config.json" | cut -d ' ' -f 2-3 | nl -s ') '
-        until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
-                if [[ ${CLIENT_NUMBER} == '1' ]]; then
-                        read -rp "Select one client [1]: " CLIENT_NUMBER
-                else
-                        read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
-                fi
-        done
-user=$(grep -E "^### " "/etc/xray/config.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-domain=$(cat /etc/xray/domain)
-iplim=$(cat /etc/kyt/limit/vmess/ip/$user)
-Quota=$(cat /etc/vmess/$user)
-uuid=$(grep -E "^### " "/etc/vmess/.vmess.db" | cut -d ' ' -f 4 | sed -n "${CLIENT_NUMBER}"p)
-#Quota=$(grep -E "^### " "/etc/xray/config.json" | cut -d ' ' -f 5 | sed -n "${CLIENT_NUMBER}"p)
-exp=$(grep -E "^### " "/etc/xray/config.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
-hariini=`date -d "0 days" +"%Y-%m-%d"`
-asu=`cat<<EOF
-      {
-      "v": "2",
-      "ps": "${user}",
-      "add": "${domain}",
-      "port": "443",
-      "id": "${uuid}",
-      "aid": "0",
-      "net": "ws",
-      "path": "/vmess",
-      "type": "none",
-      "host": "${domain}",
-      "tls": "tls"
-}
-EOF`
-ask=`cat<<EOF
-      {
-      "v": "2",
-      "ps": "${user}",
-      "add": "${domain}",
-      "port": "80",
-      "id": "${uuid}",
-      "aid": "0",
-      "net": "ws",
-      "path": "/vmess",
-      "type": "none",
-      "host": "${domain}",
-      "tls": "none"
-}
-EOF`
-grpc=`cat<<EOF
-      {
-      "v": "2",
-      "ps": "${user}",
-      "add": "${domain}",
-      "port": "443",
-      "id": "${uuid}",
-      "aid": "0",
-      "net": "grpc",
-      "path": "vmess-grpc",
-      "type": "none",
-      "host": "${domain}",
-      "tls": "tls"
-}
-EOF`
-cat >/var/www/html/vmess-$user.txt <<-END
+# Ambil user dari database VMess, bukan dari /etc/xray/config.json.
+# Alasan: config.json punya 2 entry per user, yaitu WS dan gRPC.
+mapfile -t CLIENTS < <(
+    awk '$1=="###" {print $2, $3, $4, $5, $6}' "$DB_FILE" | awk '!seen[$1]++'
+)
 
+NUMBER_OF_CLIENTS=${#CLIENTS[@]}
+
+if [ "$NUMBER_OF_CLIENTS" -eq 0 ]; then
+    echo ""
+    echo -e "${RED}You have no existing clients!${NC}"
+    echo ""
+    line
+    pause_back
+fi
+
+echo -e "     No  Expired      User"
+echo -e "     --  ----------   ----------------"
+
+no=1
+for row in "${CLIENTS[@]}"; do
+    user=$(echo "$row" | awk '{print $1}')
+    exp=$(echo "$row" | awk '{print $2}')
+    printf "     %-3s %-10s   %s\n" "$no)" "$exp" "$user"
+    no=$((no + 1))
+done
+
+line
+
+while true; do
+    if [ "$NUMBER_OF_CLIENTS" -eq 1 ]; then
+        read -rp "Select one client [1]: " CLIENT_NUMBER
+    else
+        read -rp "Select one client [1-${NUMBER_OF_CLIENTS}]: " CLIENT_NUMBER
+    fi
+
+    if [[ "$CLIENT_NUMBER" =~ ^[0-9]+$ ]] && [ "$CLIENT_NUMBER" -ge 1 ] && [ "$CLIENT_NUMBER" -le "$NUMBER_OF_CLIENTS" ]; then
+        break
+    fi
+
+    echo -e "${RED}Input tidak valid.${NC}"
+done
+
+SELECTED="${CLIENTS[$((CLIENT_NUMBER - 1))]}"
+
+user=$(echo "$SELECTED" | awk '{print $1}')
+exp=$(echo "$SELECTED" | awk '{print $2}')
+uuid=$(echo "$SELECTED" | awk '{print $3}')
+Quota=$(echo "$SELECTED" | awk '{print $4}')
+iplimit=$(echo "$SELECTED" | awk '{print $5}')
+
+domain=$(safe_cat "$DOMAIN_FILE" "domain.com")
+NS=$(safe_cat "$DNS_FILE" "-")
+PUB=$(safe_cat "$PUB_FILE" "-")
+CITY=$(safe_cat "$CITY_FILE" "-")
+
+[ -z "$Quota" ] && Quota="0"
+[ -z "$iplimit" ] && iplimit="0"
+
+if [ -f "/etc/kyt/limit/vmess/ip/$user" ]; then
+    iplimit=$(cat "/etc/kyt/limit/vmess/ip/$user")
+fi
+
+if [ -f "/etc/vmess/$user" ]; then
+    quota_bytes=$(cat "/etc/vmess/$user")
+    if [[ "$quota_bytes" =~ ^[0-9]+$ ]] && [ "$quota_bytes" -gt 0 ]; then
+        Quota=$((quota_bytes / 1024 / 1024 / 1024))
+    fi
+fi
+
+vmess_tls_json=$(cat <<EOF
+{
+  "v": "2",
+  "ps": "Vmess-${user}-WS TLS",
+  "add": "${domain}",
+  "port": "443",
+  "id": "${uuid}",
+  "aid": "0",
+  "net": "ws",
+  "path": "/vmess",
+  "type": "none",
+  "host": "${domain}",
+  "tls": "tls"
+}
+EOF
+)
+
+vmess_ntls_json=$(cat <<EOF
+{
+  "v": "2",
+  "ps": "Vmess-${user}-WS Non TLS",
+  "add": "${domain}",
+  "port": "80",
+  "id": "${uuid}",
+  "aid": "0",
+  "net": "ws",
+  "path": "/vmess",
+  "type": "none",
+  "host": "${domain}",
+  "tls": "none"
+}
+EOF
+)
+
+vmess_grpc_json=$(cat <<EOF
+{
+  "v": "2",
+  "ps": "Vmess-${user}-gRPC",
+  "add": "${domain}",
+  "port": "443",
+  "id": "${uuid}",
+  "aid": "0",
+  "net": "grpc",
+  "path": "vmess-grpc",
+  "type": "none",
+  "host": "${domain}",
+  "tls": "tls"
+}
+EOF
+)
+
+vmesslink1="vmess://$(b64_encode "$vmess_tls_json")"
+vmesslink2="vmess://$(b64_encode "$vmess_ntls_json")"
+vmesslink3="vmess://$(b64_encode "$vmess_grpc_json")"
+
+mkdir -p /var/www/html
+
+cat >"/var/www/html/vmess-${user}.txt" <<END
 ◇━━━━━━━━━━━━━━━━━◇
- Dragon Emperor Tunneling 
+ Dragon Emperor Tunneling
 ◇━━━━━━━━━━━━━━━━━◇
+
 # Format Vmess WS TLS
-
-- name: Vmess-$user-WS TLS
+- name: Vmess-${user}-WS TLS
   type: vmess
   server: ${domain}
   port: 443
@@ -108,8 +235,7 @@ cat >/var/www/html/vmess-$user.txt <<-END
       Host: ${domain}
 
 # Format Vmess WS Non TLS
-
-- name: Vmess-$user-WS Non TLS
+- name: Vmess-${user}-WS Non TLS
   type: vmess
   server: ${domain}
   port: 80
@@ -127,11 +253,10 @@ cat >/var/www/html/vmess-$user.txt <<-END
       Host: ${domain}
 
 # Format Vmess gRPC
-
-- name: Vmess-$user-gRPC (SNI)
+- name: Vmess-${user}-gRPC
+  type: vmess
   server: ${domain}
   port: 443
-  type: vmess
   uuid: ${uuid}
   alterId: 0
   cipher: auto
@@ -143,59 +268,55 @@ cat >/var/www/html/vmess-$user.txt <<-END
     grpc-service-name: vmess-grpc
 
 ◇━━━━━━━━━━━━━━━━━◇
- Link Akun Vmess                   
-◇━━━━━━━━━━━━━━━━━◇
-Link TLS         : 
-${vmesslink1}
-◇━━━━━━━━━━━━━━━━━◇
-Link none TLS    : 
-${vmesslink2}
-◇━━━━━━━━━━━━━━━━━◇
-Link GRPC        : 
-${vmesslink3}
+ Link Akun Vmess
 ◇━━━━━━━━━━━━━━━━━◇
 
+Link TLS:
+${vmesslink1}
+
+◇━━━━━━━━━━━━━━━━━◇
+
+Link none TLS:
+${vmesslink2}
+
+◇━━━━━━━━━━━━━━━━━◇
+
+Link GRPC:
+${vmesslink3}
+
+◇━━━━━━━━━━━━━━━━━◇
 END
-vmesslink1="vmess://$(echo $asu | base64 -w 0)"
-vmesslink2="vmess://$(echo $ask | base64 -w 0)"
-vmesslink3="vmess://$(echo $grpc | base64 -w 0)"
 
 clear
 echo -e ""
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
 echo -e " Xray/Vmess Account "
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
 echo -e "Remarks          : ${user}"
 echo -e "Domain           : ${domain}"
 echo -e "User Quota       : ${Quota} GB"
-echo -e "User Ip            : ${iplimit} IP"
-echo -e "Port TLS         : 400-900"
-echo -e "Port none TLS    : 80, 8080, 8081-9999"
-echo -e "id               : ${uuid}"
-echo -e "Xray Dns      : ${NS}"
-echo -e "Pubkey        : ${PUB}"
-echo -e "alterId          : 0"
+echo -e "User IP Limit    : ${iplimit} IP"
+echo -e "Port TLS         : 443"
+echo -e "Port none TLS    : 80"
+echo -e "UUID             : ${uuid}"
+echo -e "Xray DNS         : ${NS}"
+echo -e "Pubkey           : ${PUB}"
+echo -e "AlterId          : 0"
 echo -e "Security         : auto"
-echo -e "Network          : ws"
-echo -e "Path             : /Multi-Path"
-echo -e "Dynamic          : https://bugmu.com/path"
+echo -e "Network          : ws / grpc"
+echo -e "Path WS          : /vmess"
 echo -e "ServiceName      : vmess-grpc"
-#echo -e "Host XrayDNS : ${NS}"
-#echo -e "Location         : $CITY"
-#echo -e "Pub Key          : ${PUB}"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
+echo -e "Location         : ${CITY}"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
 echo -e "Link TLS         : ${vmesslink1}"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
 echo -e "Link none TLS    : ${vmesslink2}"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
 echo -e "Link GRPC        : ${vmesslink3}"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
-echo -e "Format OpenClash : https://${domain}:81/vmess-$user.txt"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
-echo -e "Aktif Selama     : $masaaktif Hari"
-echo -e "Dibuat Pada      : $tnggl"
-echo -e "Berakhir Pada    : $expe"
-echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
-echo ""
-read -n 1 -s -r -p "Press [ Enter ] to back on menu"
-menu
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
+echo -e "Format OpenClash : https://${domain}:81/vmess-${user}.txt"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
+echo -e "Expired On       : ${exp}"
+echo -e "${BLUE}◇━━━━━━━━━━━━━━━━━◇${NC}"
+
+pause_back
