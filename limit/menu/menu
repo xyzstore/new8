@@ -103,9 +103,9 @@ xray_service=$(systemctl is-active xray 2>/dev/null)
 nginx_service=$(systemctl is-active nginx 2>/dev/null)
 clear
 if [[ $ssh_service == "active" ]]; then
-status_ssh="${GREEN}✓${NC}"
+status_ssh="${GREEN}âœ“${NC}"
 else
-status_ssh="${RED}🔴${NC} "
+status_ssh="${RED}ðŸ”´${NC} "
 fi
 ssh_ws=$(systemctl is-active ws 2>/dev/null)
 if [[ $ssh_ws == "active" ]]; then
@@ -132,12 +132,12 @@ fi
 if [[ $nginx_service == "active" ]]; then
 status_nginx="${GREEN}ON  ${NC}"
 else
-status_nginx="${RED}🔴${NC} "
+status_nginx="${RED}ðŸ”´${NC} "
 fi
 if [[ $dropbear_service == "active" ]]; then
 status_dropbear="${GREEN}ON ${NC}"
 else
-status_dropbear="${RED}🔴${NC} "
+status_dropbear="${RED}ðŸ”´${NC} "
 fi
 vlx=$(grep -c -E "^#& " "/etc/xray/config.json")
 let vla=$vlx/2
@@ -228,18 +228,18 @@ onView() {
     > mow  # clear file dulu
 
     for i in {52..57} {57..52}; do
-        echo -en "\e[38;5;${i}m———\e[0m" >> mow
+        echo -en "\e[38;5;${i}mâ€”â€”â€”\e[0m" >> mow
     done
 
     local m=$(cat mow)
-    echo -e "${KEATAS}  ${m}\e[38;5;52m—\e[0m"
+    echo -e "${KEATAS}  ${m}\e[38;5;52mâ€”\e[0m"
 
     rm -f mow
 }
 
 laneBlue() {
     local m=""
-    local po="————"
+    local po="â€”â€”â€”â€”"
 
     for i in {52..57}; do
         m+="\e[38;5;${i}m${po}\e[0m"
@@ -249,54 +249,50 @@ laneBlue() {
     done
 
     # tambah biar pas
-    m+="\e[38;5;52m——\e[0m"
+    m+="\e[38;5;52mâ€”â€”\e[0m"
     echo -e " $m"
 }
 
-echo -e "\033[0;34m┌──────────────────────────────────────────────┐$NC"
-echo -e "\033[0;34m│ \033[41;97m                XYZ TUNNELING               \033[0;34m │$NC"
-echo -e "\033[0;34m└──────────────────────────────────────────────┘$NC"
-echo -e "\033[0;34m┌──────────────────────────────────────────────┐$NC"
-echo -e "\033[0;34m│ $WHITE OS      $NC: $MODEL"
-echo -e "\033[0;34m│ $WHITE RAM     $NC: ${RAM}MB"
-echo -e "\033[0;34m│ $WHITE SWAP    $NC: $(free -m | awk 'NR==3 {print $2}')MB"
-echo -e "\033[0;34m│ $WHITE CITY    $NC: $CITY"
-echo -e "\033[0;34m│ $WHITE ISP     $NC: $ISP"
-echo -e "\033[0;34m│ $WHITE IP      $NC: \033[1;31m$IPVPS\033[0m"
-echo -e "\033[0;34m│ $WHITE DOMAIN  $NC: $domain"
-echo -e "\033[0;34m│ $WHITE UPTIME  $NC: $SERONLINE"
-echo -e "\033[0;34m│$(onView)"
-echo -e "\033[0;34m│ $WHITE MONTH   $NC: $month_show"
-echo -e "\033[0;34m│ $WHITE RX      $NC: $month_rx"
-echo -e "\033[0;34m│ $WHITE TX      $NC: $month_tx"
-echo -e "\033[0;34m│$(onView)"
-echo -e "\033[0;34m│ $WHITE DAY     $NC: $day_show"
-echo -e "\033[0;34m│ $WHITE RX      $NC: $day_rx"
-echo -e "\033[0;34m│ $WHITE TX      $NC: $day_tx"
-echo -e "\033[0;34m│ $WHITE TRAFFIC $NC: $day_trf"
-echo -e "\033[0;34m└──────────────────────────────────────────────┘$NC"
-echo -e "\033[0;34m┌──────────────────────────────────────────────┐$NC"
-echo -e "\033[0;34m│$WHITE XRAY: $status_xray | SSH-WS: $status_ws_epro | LOADBLC: $status_haproxy | $system_health\033[0;34m│$NC"
-echo -e "\033[0;34m└──────────────────────────────────────────────┘$NC"
-echo -e "\033[0;34m   ┌────────────────────────────────────────┐$NC"
-echo -e "\033[0;34m   │  ${WHITE}Version     ${NC}: SPv${XRAY_VERSION}"
-echo -e "\033[0;34m   │  ${WHITE}Order By    ${NC}: \e[0;33mArivpnstore\e[0m"
-echo -e "\033[0;34m   │  ${WHITE}Client Name ${NC}: \e[1;31m${username}\e[0m"
-echo -e "\033[0;34m   │  ${WHITE}Expiry In   ${NC}: \e[1;31m${certifacate} Days\e[0m"
-echo -e "\033[0;34m   └────────────────────────────────────────┘$NC"
-echo -e "\033[0;34m$(laneBlue)"
-echo -e "\033[0;34m┌──────────────────────────────────────────────┐$NC"
-echo -e "\033[0;34m│  ${GREEN}1.) ☞ ${NC}SSH               ${GREEN}10.) ☞ ${NC}BOT PANEL    \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}2.) ☞ ${NC}VMESS             ${GREEN}11.) ☞ ${NC}BOT NOTIF    \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}3.) ☞ ${NC}VLESS             ${GREEN}12.) ☞ ${NC}SPEEDTEST    \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}4.) ☞ ${NC}TROJAN            ${GREEN}13.) ☞ ${NC}ADD DOMAIN   \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}5.) ☞ ${NC}ZIVPN             ${GREEN}14.) ☞ ${NC}CERT SSL     \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}6.) ☞ ${NC}BACKUP & RESTORE  ${GREEN}15.) ☞ ${NC}CHECK SERVICE\033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}7.) ☞ ${NC}INSTALL UDP       ${GREEN}16.) ☞ ${NC}ALL SERVICE  \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}8.) ☞ ${NC}CHARGER BANNER    ${GREEN}17.) ☞ ${NC}SOCKS5       \033[0;34m│$NC"
-echo -e "\033[0;34m│  ${GREEN}9.) ☞ ${NC}UPDATE SCRIPT     ${GREEN} x.) ☞ ${NC}EXIT         \033[0;34m│$NC"
-echo -e "\033[0;34m└──────────────────────────────────────────────┘$NC"
-echo -e "\033[0;34m$(laneBlue)"
+echo -e "\e[38;5;45mâ•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;45mâ”‚\e[0m \e[1;97m                 XYUZZ VPN PANEL              \e[38;5;45mâ”‚\e[0m"
+echo -e "\e[38;5;45mâ”‚\e[0m \e[38;5;250m        Fast â€¢ Stable â€¢ Private Tunneling      \e[38;5;45mâ”‚\e[0m"
+echo -e "\e[38;5;45mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;33mâ•­â”€ SERVER INFO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;33mâ”‚\e[0m OS       : ${WHITE}$MODEL${NC}"
+echo -e "\e[38;5;33mâ”‚\e[0m DOMAIN   : ${WHITE}$domain${NC}"
+echo -e "\e[38;5;33mâ”‚\e[0m IP       : \e[1;91m$IPVPS\e[0m"
+echo -e "\e[38;5;33mâ”‚\e[0m LOCATION : ${WHITE}$CITY${NC} â€¢ ${WHITE}$ISP${NC}"
+echo -e "\e[38;5;33mâ”‚\e[0m UPTIME   : ${WHITE}$SERONLINE${NC}"
+echo -e "\e[38;5;33mâ”‚\e[0m RAM/SWAP : ${WHITE}${USAGERAM}/${RAM}MB${NC} â€¢ ${WHITE}${swap_total:-0}MB${NC}"
+echo -e "\e[38;5;33mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;39mâ•­â”€ TRAFFIC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;39mâ”‚\e[0m MONTH    : ${WHITE}$month_show${NC}  RX: ${WHITE}$month_rx${NC}  TX: ${WHITE}$month_tx${NC}"
+echo -e "\e[38;5;39mâ”‚\e[0m TODAY    : ${WHITE}$day_show${NC}  RX: ${WHITE}$day_rx${NC}  TX: ${WHITE}$day_tx${NC}"
+echo -e "\e[38;5;39mâ”‚\e[0m LIVE     : ${WHITE}$day_trf${NC}"
+echo -e "\e[38;5;39mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;82mâ•­â”€ SERVICE STATUS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;82mâ”‚\e[0m XRAY: $status_xray   SSH-WS: $status_ws_epro   HAPROXY: $status_haproxy   HEALTH: $system_health"
+echo -e "\e[38;5;82mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;213mâ•­â”€ ACCOUNT SUMMARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;213mâ”‚\e[0m SSH: ${WHITE}$ssh1${NC}   VMESS: ${WHITE}$vma${NC}   VLESS: ${WHITE}$vla${NC}   TROJAN: ${WHITE}$trb${NC}   SS: ${WHITE}$ssa${NC}"
+echo -e "\e[38;5;213mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;220mâ•­â”€ LICENSE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;220mâ”‚\e[0m VERSION  : ${WHITE}SPv${XRAY_VERSION}${NC}"
+echo -e "\e[38;5;220mâ”‚\e[0m ORDER BY : \e[1;93mArivpnstore\e[0m"
+echo -e "\e[38;5;220mâ”‚\e[0m CLIENT   : \e[1;91m${username}\e[0m"
+echo -e "\e[38;5;220mâ”‚\e[0m EXPIRED  : \e[1;91m${certifacate} Days\e[0m"
+echo -e "\e[38;5;220mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
+echo -e "\e[38;5;45mâ•­â”€ MAIN MENU â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®\e[0m"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}01${NC}. SSH / OPENVPN       ${GREEN}10${NC}. BOT PANEL"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}02${NC}. VMESS               ${GREEN}11${NC}. BOT NOTIF"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}03${NC}. VLESS               ${GREEN}12${NC}. SPEEDTEST"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}04${NC}. TROJAN              ${GREEN}13${NC}. ADD DOMAIN"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}05${NC}. ZIVPN               ${GREEN}14${NC}. CERT SSL"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}06${NC}. BACKUP & RESTORE    ${GREEN}15${NC}. CHECK SERVICE"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}07${NC}. INSTALL UDP         ${GREEN}16${NC}. ALL SERVICE"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}08${NC}. CHANGE VPN BANNER   ${GREEN}17${NC}. SOCKS5"
+echo -e "\e[38;5;45mâ”‚\e[0m  ${GREEN}09${NC}. UPDATE SCRIPT       ${GREEN}x${NC}. EXIT"
+echo -e "\e[38;5;45mâ•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯\e[0m"
 echo -e ""
 read -p " Select From Options [1-17 or x] : " opt
 echo -e ""
@@ -331,14 +327,14 @@ wget https://rajaserver.web.id/v7/udp-custom.sh && chmod +x udp-custom.sh && ./u
 ;;
 8 | 08)
 clear
-echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo -e "       CHANGE VPN BANNER"
-echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo -e "Paste/edit banner HTML untuk tampilan"
 echo -e ""
 echo -e "Kalau selesai:"
 echo -e "CTRL + O, Enter, CTRL + X"
-echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 sleep 2
 nano /etc/kyt.txt
 systemctl restart dropbear 2>/dev/null || service dropbear restart
@@ -348,7 +344,7 @@ read -n 1 -s -r -p "Tekan Enter untuk kembali..."
 ;;
 9 | 09)
 clear
-wget https://rajaserver.web.id/v7/menu/update.sh && chmod +x update.sh && ./update.sh
+wget https://raw.githubusercontent.com/xyzstore/new8/master/update.sh && chmod +x update.sh && ./update.sh
 ;;
 10 | 10)
 clear
