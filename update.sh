@@ -41,17 +41,19 @@ fun_bar() {
     echo -e "\033[0;33m]\033[1;37m -\033[1;32m OK !\033[1;37m"
     tput cnorm
 }
-
 res1() {
     clear
     echo -e "Updating menu from GitHub folder..."
 
     rm -rf /tmp/new8-master /tmp/new8.zip
 
-    apt update -y >/dev/null 2>&1
-    apt install -y unzip curl dos2unix >/dev/null 2>&1
+    command -v curl >/dev/null 2>&1 || apt install -y curl >/dev/null 2>&1
+    command -v unzip >/dev/null 2>&1 || apt install -y unzip >/dev/null 2>&1
+    command -v dos2unix >/dev/null 2>&1 || apt install -y dos2unix >/dev/null 2>&1
 
-    curl -L -o /tmp/new8.zip https://github.com/xyzstore/new8/archive/refs/heads/master.zip
+    curl -L --connect-timeout 15 --max-time 120 \
+        -o /tmp/new8.zip \
+        https://github.com/xyzstore/new8/archive/refs/heads/master.zip
 
     if [ ! -s /tmp/new8.zip ]; then
         echo "Gagal download GitHub archive."
@@ -89,7 +91,6 @@ EOF
 
     echo -e "Update menu selesai."
 }
-
 clear
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "\033[1;96m UPDATE SCRIPT \E[0m"
