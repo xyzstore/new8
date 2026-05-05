@@ -59,13 +59,45 @@ domain=$(cat /etc/xray/domain)
 ISP=$(curl -s ipinfo.io/org | cut -d " " -f 2-10)
 CITY=$(curl -s ipinfo.io/city)
 clear
+
+account_exists() {
+  local u="$1"
+  [ -z "$u" ] && return 1
+  getent passwd "$u" >/dev/null 2>&1 && return 0
+  grep -qw -- "$u" /etc/xray/config.json 2>/dev/null && return 0
+  grep -qw -- "$u" /etc/ssh/.ssh.db 2>/dev/null && return 0
+  grep -qw -- "$u" /etc/vmess/.vmess.db 2>/dev/null && return 0
+  grep -qw -- "$u" /etc/vless/.vless.db 2>/dev/null && return 0
+  grep -qw -- "$u" /etc/trojan/.trojan.db 2>/dev/null && return 0
+  grep -qw -- "$u" /etc/shadowsocks/.shadowsocks.db 2>/dev/null && return 0
+  find /etc/kyt/limit -type f -path "*/ip/$u" 2>/dev/null | grep -q . && return 0
+  return 1
+}
+
+show_duplicate_user() {
+  local u="$1"
+  clear
+  echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◇\033[0m"
+  echo -e "\033[1;31m       USERNAME SUDAH TERDAFTAR\033[0m"
+  echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◇\033[0m"
+  echo -e "Username \033[1;33m$u\033[0m sudah ada di sistem/protokol lain."
+  echo -e "Silakan gunakan username lain."
+  echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━◇\033[0m"
+  read -n 1 -s -r -p "Press any key to back on menu"
+  menu 2>/dev/null || m-sshws 2>/dev/null || exit 1
+}
+
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
   echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
   echo -e "\033[1;96m         Add Xray/Vless Account          \E[0m"
   echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 
   read -rp "User: " -e user
-  CLIENT_EXISTS=$(grep -w $user /etc/xray/config.json | wc -l)
+  if account_exists "$user"; then
+      CLIENT_EXISTS=1
+    else
+      CLIENT_EXISTS=0
+    fi
 
   if [[ ${CLIENT_EXISTS} == '1' ]]; then
     clear
@@ -73,11 +105,12 @@ until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
   echo -e " CREATE VLESS ACCOUNT           "
   echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
     echo ""
-    echo "A client with the specified name was already created, please choose another name."
+    echo "Username sudah ada di sistem/protokol lain, silakan gunakan username lain."
     echo ""
     echo -e "\033[0;34m◇━━━━━━━━━━━━━━━━━◇\033[0m"
     read -n 1 -s -r -p "Press any key to back on menu"
     menu
+    exit 1
   fi
 done
 uuid="${CUSTOM_UUID:-$(cat /proc/sys/kernel/random/uuid)}"
