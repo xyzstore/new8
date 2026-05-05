@@ -6,7 +6,7 @@ user=$1
 Pass=$2
 iplimit=$3
 masaaktif=$4
-Login="${user}SSH$(tr -dc 0-9 </dev/urandom | head -c3)"
+Login="${user}"
 IP=$(curl -sS ipv4.icanhazip.com)
 data_server=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
 date_list=$(date +"%Y-%m-%d" -d "$data_server")
@@ -47,7 +47,7 @@ fi
 
 egrep "^$Login" /etc/passwd >/dev/null
 if [ $? -eq 0 ]; then
-    echo "User $Login sudah ada."
+    echo "Client already exists"
     exit 1
 fi
 ISP=$(cat /etc/xray/isp)
