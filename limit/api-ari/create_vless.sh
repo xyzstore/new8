@@ -3,7 +3,11 @@ Login=$1
 masaaktif=$2
 iplimit=$3
 Quota=$4
-user="${Login}VL$(tr -dc 0-9 </dev/urandom | head -c3)"
+user="${Login}"
+if grep -qw "^#& ${user}" /etc/vless/.vless.db 2>/dev/null; then
+    echo "Client already exists"
+    exit 1
+fi
 IP=$(curl -sS ipv4.icanhazip.com)
 data_server=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
 date_list=$(date +"%Y-%m-%d" -d "$data_server")
