@@ -1,6 +1,10 @@
 #!/bin/bash
-# COLOR VALIDATION
+
 clear
+
+# =========================
+# COLOR
+# =========================
 RED='\033[0;31m'
 NC='\033[0m'
 gray="\e[1;30m"
@@ -8,165 +12,360 @@ Blue="\033[0;34m"
 green='\033[0;36m'
 grenbo="\e[92;1m"
 YELL='\033[0;33m'
-red() { echo -e "\\033[32;1m${*}\\033[0m"; }
-# Getting
-MYIP=$(curl -sS ipv4.icanhazip.com)
 
-clear
-IP=$(wget -qO- icanhazip.com)
+red() { echo -e "\033[32;1m${*}\033[0m"; }
+
+# =========================
+# CONFIG IZIN
+# =========================
+IZIN_URL="https://raw.githubusercontent.com/xyzstore/izin/main/ip"
 dateToday=$(date +"%Y-%m-%d")
-Name=$(curl https://raw.githubusercontent.com/xyzstore/izin/main/ip | grep $MYIP | awk '{print $2}')
 
+MYIP=$(curl -sS ipv4.icanhazip.com)
+IP="$MYIP"
+
+Name=$(curl -sS "$IZIN_URL" | awk -v ip="$MYIP" '$1 == ip {print $2; exit}')
+Exp=$(curl -sS "$IZIN_URL" | awk -v ip="$MYIP" '$1 == ip {print $3; exit}')
+IP_Check=$(curl -sS "$IZIN_URL" | awk -v ip="$MYIP" '$1 == ip {print $1; exit}')
+
+# =========================
+# VALIDASI IP
+# =========================
+if [[ -z "$MYIP" ]]; then
+    echo -e "${RED}Gagal mengambil IP VPS.${NC}"
+    exit 1
+fi
+
+if [[ -z "$IP_Check" ]]; then
+    clear
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}          IP VPS BELUM TERDAFTAR        ${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "IP VPS : ${YELL}$MYIP${NC}"
+    echo -e "Status : ${RED}Tidak terdaftar${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    exit 1
+fi
+
+if [[ -n "$Exp" && "$Exp" < "$dateToday" ]]; then
+    clear
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}             IZIN VPS EXPIRED           ${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "IP VPS  : ${YELL}$MYIP${NC}"
+    echo -e "User    : ${YELL}$Name${NC}"
+    echo -e "Expired : ${RED}$Exp${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    exit 1
+fi
+
+# =========================
+# SETUP BOT
+# =========================
 setup_bot() {
-    switch=$(grep -i "switch" /root/.bckupbot | awk '{print $2}')
+    switch=$(grep -i "switch" /root/.bckupbot 2>/dev/null | awk '{print $2}')
+
+    [[ -z "$switch" ]] && switch="off"
+
     echo "Pergi ke @BotFather dan type /newbot untuk membuat bot baru"
     echo "Pergi ke @MissRose_bot dan type /id untuk mendapatkan ID telegram"
     echo ""
-    read -p "Bot Token : " getToken
-    read -p "Admin ID  : " adminID
+    read -rp "Bot Token : " getToken
+    read -rp "Admin ID  : " adminID
+
     echo "$getToken" >/root/.bckupbot
     echo "$adminID" >>/root/.bckupbot
     echo "switch $switch" >>/root/.bckupbot
+
     read -n 1 -s -r -p "Press any key to back on Bot menu"
     botbckpBot_menu
 }
 
+# =========================
+# BACKUP VPS
+# =========================
 botBackup() {
-    bottoken=$(sed -n '1p' /root/.bckupbot | awk '{print $1}')
-    adminid=$(sed -n '2p' /root/.bckupbot | awk '{print $1}')
-    echo -e "[ ${green}INFO${NC} ] Create password for database"
-	read -t 10 -p "Enter password : "  InputPass
-	if [[ -z $InputPass ]]; then
-	InputPass="pakyavpnxbackdoor"
-	fi
-	sleep 1
-    echo -e "[ ${green}INFO${NC} ] • VPS Data Backup... "
-    sleep 1
-    echo -e "[ ${green}INFO${NC} ] • Directory Created... "
-    mkdir /root/backup &>/dev/null
-    sleep 1
-    echo -e "[ ${green}INFO${NC} ] • VPS Data Backup Start Now... "
-    echo -e "[ ${green}INFO${NC} ] • Please Wait , Backup In Process Now... "
-    sleep 1
-	cp /etc/passwd backup/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Backup passwd data..."
-	sleep 1
-	cp /etc/group backup/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Backup group data..."
-	sleep 1
-	cp /etc/shadow backup/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Backup shadow data..."
-	sleep 1
-	cp /etc/gshadow backup/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Backup gshadow data..."
-	sleep 1
-    cp -r /var/lib/kyt/ backup/kyt &>/dev/null
-    cp -r /etc/xray backup/xray &>/dev/null
-    cp -r /var/www/html backup/html &>/dev/null
-    cd /root &>/dev/null
-    zip -rP "$InputPass" "$IP-$Name-$dateToday.zip" backup >/dev/null 2>&1
+    bottoken=$(sed -n '1p' /root/.bckupbot 2>/dev/null | awk '{print $1}')
+    adminid=$(sed -n '2p' /root/.bckupbot 2>/dev/null | awk '{print $1}')
 
-    echo -e "[ ${green}INFO${NC} ] • Sending Via Bot... "
-    curl -Ss --request POST \
+    if [[ -z "$bottoken" || -z "$adminid" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Bot Token atau Admin ID belum diset."
+        sleep 2
+        setup_bot
+        return
+    fi
+
+    echo -e "[ ${green}INFO${NC} ] Create password for database"
+    read -rsp "Enter password : " InputPass
+    echo ""
+
+    if [[ -z "$InputPass" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Password tidak boleh kosong."
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
+
+    sleep 1
+    echo -e "[ ${green}INFO${NC} ] • VPS Data Backup..."
+    sleep 1
+
+    rm -rf /root/backup
+    mkdir -p /root/backup
+
+    echo -e "[ ${green}INFO${NC} ] • Directory Created..."
+    sleep 1
+
+    echo -e "[ ${green}INFO${NC} ] • VPS Data Backup Start Now..."
+    echo -e "[ ${green}INFO${NC} ] • Please Wait, Backup In Process Now..."
+    sleep 1
+
+    cp /etc/passwd /root/backup/ &>/dev/null
+    echo -e "[ ${green}INFO${NC} ] • Backup passwd data..."
+    sleep 1
+
+    cp /etc/group /root/backup/ &>/dev/null
+    echo -e "[ ${green}INFO${NC} ] • Backup group data..."
+    sleep 1
+
+    cp /etc/shadow /root/backup/ &>/dev/null
+    echo -e "[ ${green}INFO${NC} ] • Backup shadow data..."
+    sleep 1
+
+    cp /etc/gshadow /root/backup/ &>/dev/null
+    echo -e "[ ${green}INFO${NC} ] • Backup gshadow data..."
+    sleep 1
+
+    cp -r /var/lib/kyt/ /root/backup/kyt &>/dev/null
+    cp -r /etc/xray /root/backup/xray &>/dev/null
+    cp -r /var/www/html /root/backup/html &>/dev/null
+
+    cd /root || exit 1
+
+    BackupFile="/root/${IP}-${Name}-${dateToday}.zip"
+
+    zip -rP "$InputPass" "$BackupFile" backup >/dev/null 2>&1
+
+    if [[ ! -f "$BackupFile" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Gagal membuat file backup."
+        rm -rf /root/backup
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
+
+    echo -e "[ ${green}INFO${NC} ] • Sending Via Bot..."
+
+    curl -sS --request POST \
         --url "https://api.telegram.org/bot${bottoken}/sendDocument?chat_id=${adminid}&caption=Here Your Backup Today : ${dateToday}" \
         --header 'content-type: multipart/form-data' \
-        --form document=@"/root/$IP-$Name-$dateToday.zip" >/root/t1
+        --form document=@"$BackupFile" >/root/t1
 
     fileId=$(grep -o '"file_id":"[^"]*' /root/t1 | grep -o '[^"]*$')
 
-    curl -Ss --request GET \
-        --url "https://api.telegram.org/bot${bottoken}/getfile?file_id=${fileId}" >/root/t1
+    if [[ -z "$fileId" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Gagal mengirim backup ke Telegram."
+        rm -rf /root/backup
+        rm -f "$BackupFile"
+        rm -f /root/t1
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
 
-    filePath=$(grep -o '"file_path":"[^"]'* /root/t1 | grep -o '[^"]*$')
+    curl -sS --request GET \
+        --url "https://api.telegram.org/bot${bottoken}/getFile?file_id=${fileId}" >/root/t1
 
-    curl -Ss --request GET \
-        --url "https://api.telegram.org/bot${bottoken}/sendMessage?chat_id=${adminid}&text=File ID   : <code>${fileId}</code>&parse_mode=html" &>/dev/null
-    curl -Ss --request GET \
+    filePath=$(grep -o '"file_path":"[^"]*' /root/t1 | grep -o '[^"]*$')
+
+    curl -sS --request GET \
+        --url "https://api.telegram.org/bot${bottoken}/sendMessage?chat_id=${adminid}&text=File ID : <code>${fileId}</code>&parse_mode=html" &>/dev/null
+
+    curl -sS --request GET \
         --url "https://api.telegram.org/bot${bottoken}/sendMessage?chat_id=${adminid}&text=File Path : <code>${filePath}</code>&parse_mode=html" &>/dev/null
 
-    echo -e "[ ${green}INFO${NC} ] • Completed... "
+    echo -e "[ ${green}INFO${NC} ] • Completed..."
 
     rm -rf /root/backup
-    rm -r /root/$IP-$Name-$dateToday.zip
+    rm -f "$BackupFile"
     rm -f /root/t1
+
     read -n 1 -s -r -p "Press any key to back on menu"
     botbckpBot_menu
 }
 
+# =========================
+# RESTORE VPS
+# =========================
 restoreBot() {
-    bottoken=$(sed -n '1p' /root/.bckupbot | awk '{print $1}')
-    read -p "File ID   : " fileId
-    read -p "File PATH : " filePath
-    curl -Ss --request GET \
-        --url "https://api.telegram.org/file/bot${bottoken}/${filePath}?file_id=${fileId}" >backup.zip
+    bottoken=$(sed -n '1p' /root/.bckupbot 2>/dev/null | awk '{print $1}')
+
+    if [[ -z "$bottoken" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Bot Token belum diset."
+        sleep 2
+        setup_bot
+        return
+    fi
+
+    read -rp "File ID   : " fileId
+    read -rp "File PATH : " filePath
+
+    if [[ -z "$fileId" || -z "$filePath" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] File ID dan File PATH tidak boleh kosong."
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
+
+    cd /root || exit 1
+
+    curl -sS --request GET \
+        --url "https://api.telegram.org/file/bot${bottoken}/${filePath}" >/root/backup.zip
+
+    if [[ ! -f /root/backup.zip ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Gagal download file backup."
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
 
     echo -e "[ ${green}INFO${NC} ] • Restore Data..."
-	read -rp "Password File: "  InputPass
-	echo -e "[ ${green}INFO${NC} ] • Getting your data..."
-	unzip -P $InputPass /root/backup.zip &> /dev/null
-    echo -e "[ ${green}INFO${NC} ] • Starting to restore data..."
-    rm -f /root/backup.zip &> /dev/null
-	sleep 1
-    cd /root/backup
-	echo -e "[ ${green}INFO${NC} ] • Please Wait , Restoring In Process Now... "
-	sleep 1
-	cp passwd /etc/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Restoring passwd data..."
-	sleep 1
-	cp group /etc/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Restoring group data..."
-	sleep 1
-	cp shadow /etc/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Restoring shadow data..."
-	sleep 1
-	cp gshadow /etc/ &>/dev/null
-	echo -e "[ ${green}INFO${NC} ] • Restoring gshadow data..."
-	sleep 1
-    cp -r kyt /var/lib/ &>/dev/null
-    cp -r xray /etc/ &>/dev/null
-    cp -r html /var/www/ &>/dev/null
+    read -rsp "Password File: " InputPass
+    echo ""
+
+    if [[ -z "$InputPass" ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Password tidak boleh kosong."
+        rm -f /root/backup.zip
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
+
+    echo -e "[ ${green}INFO${NC} ] • Getting your data..."
+
     rm -rf /root/backup
-    rm -f backup.zip
-    echo -e "[ ${green}INFO${NC} ] • Done Restore... "
+    unzip -P "$InputPass" /root/backup.zip -d /root/ &>/dev/null
+
+    if [[ ! -d /root/backup ]]; then
+        echo -e "[ ${RED}ERROR${NC} ] Gagal extract backup. Password mungkin salah."
+        rm -f /root/backup.zip
+        read -n 1 -s -r -p "Press any key to back on menu"
+        botbckpBot_menu
+        return
+    fi
+
+    echo -e "[ ${green}INFO${NC} ] • Starting to restore data..."
+    rm -f /root/backup.zip &>/dev/null
+    sleep 1
+
+    cd /root/backup || exit 1
+
+    echo -e "[ ${green}INFO${NC} ] • Please Wait, Restoring In Process Now..."
+    sleep 1
+
+    if [[ -f passwd ]]; then
+        cp passwd /etc/ &>/dev/null
+        echo -e "[ ${green}INFO${NC} ] • Restoring passwd data..."
+    fi
+    sleep 1
+
+    if [[ -f group ]]; then
+        cp group /etc/ &>/dev/null
+        echo -e "[ ${green}INFO${NC} ] • Restoring group data..."
+    fi
+    sleep 1
+
+    if [[ -f shadow ]]; then
+        cp shadow /etc/ &>/dev/null
+        echo -e "[ ${green}INFO${NC} ] • Restoring shadow data..."
+    fi
+    sleep 1
+
+    if [[ -f gshadow ]]; then
+        cp gshadow /etc/ &>/dev/null
+        echo -e "[ ${green}INFO${NC} ] • Restoring gshadow data..."
+    fi
+    sleep 1
+
+    if [[ -d kyt ]]; then
+        cp -r kyt /var/lib/ &>/dev/null
+    fi
+
+    if [[ -d xray ]]; then
+        cp -r xray /etc/ &>/dev/null
+    fi
+
+    if [[ -d html ]]; then
+        cp -r html /var/www/ &>/dev/null
+    fi
+
+    rm -rf /root/backup
+
+    echo -e "[ ${green}INFO${NC} ] • Done Restore..."
     read -n 1 -s -r -p "Press any key to back on menu"
     menu
 }
 
+# =========================
+# AUTO BACKUP
+# =========================
 autoBackup() {
-    switch=$(grep -i "switch" /root/.bckupbot | awk '{print $2}')
-    if [ "${switch}" == "on" ]; then
+    switch=$(grep -i "switch" /root/.bckupbot 2>/dev/null | awk '{print $2}')
+
+    if [[ "$switch" == "on" ]]; then
         sed -i 's/switch on/switch off/g' /root/.bckupbot
         sed -i "/autobackup/d" /etc/crontab
+
         service cron restart >/dev/null 2>&1
         service cron reload >/dev/null 2>&1
+
         echo "Turn Off"
     else
-        sed -i 's/switch off/switch on/g' /root/.bckupbot
+        if grep -q "switch" /root/.bckupbot; then
+            sed -i 's/switch off/switch on/g' /root/.bckupbot
+        else
+            echo "switch on" >>/root/.bckupbot
+        fi
+
+        sed -i "/autobackup/d" /etc/crontab
         echo "5 0 * * * root autobackup" >>/etc/crontab
+
         service cron restart >/dev/null 2>&1
         service cron reload >/dev/null 2>&1
+
         echo "Turn On"
     fi
+
     sleep 1
     read -n 1 -s -r -p "Press any key to back on Bot menu"
     botbckpBot_menu
 }
 
+# =========================
+# MENU BOT BACKUP
+# =========================
 botbckpBot_menu() {
-    switch=$(grep -i "switch" /root/.bckupbot | awk '{print $2}')
+    switch=$(grep -i "switch" /root/.bckupbot 2>/dev/null | awk '{print $2}')
+
     clear
-    if [ "${switch}" == "on" ]; then
+
+    if [[ "$switch" == "on" ]]; then
         sts="\033[0;32m[On]\033[0m"
     else
         sts="\033[1;31m[Off]\033[0m"
     fi
-	echo -e " ${Blue}╭═══════════════════════════════════════════════════════╮${NC}"
-	echo -e " ${Blue}│$NC\033[41m               Telegram Bot (AutoBackup)               \E[0m"
-	echo -e " ${Blue}╰═══════════════════════════════════════════════════════╯${NC}"
+
+    echo -e " ${Blue}╭═══════════════════════════════════════════════════════╮${NC}"
+    echo -e " ${Blue}│$NC\033[41m               Telegram Bot (AutoBackup)               \E[0m"
+    echo -e " ${Blue}╰═══════════════════════════════════════════════════════╯${NC}"
     echo -e " ${Blue}╭═══════════════════════════════════════════════════════╮${NC}"
     echo -e " ${Blue}│$NC ${green} VPS Data Backup"
     echo -e " ${Blue}│$NC"
+    echo -e " ${Blue}│$NC ${green} User              : ${YELL}${Name}${NC}"
+    echo -e " ${Blue}│$NC ${green} IP VPS            : ${YELL}${MYIP}${NC}"
+    echo -e " ${Blue}│$NC ${green} Expired           : ${YELL}${Exp}${NC}"
     echo -e " ${Blue}│$NC ${green} Status AutoBackup : $sts"
+    echo -e " ${Blue}│$NC"
     echo -e " ${Blue}│$NC [${green}1${NC}] Setup Bot Telegram \e[0m"
     echo -e " ${Blue}│$NC [${green}2${NC}] Auto Backup Status \e[0m"
     echo -e " ${Blue}│$NC [${green}3${NC}] Backup VPS (Telegram Bot) \e[0m"
@@ -175,45 +374,59 @@ botbckpBot_menu() {
     echo -e " ${Blue}╰═══════════════════════════════════════════════════════╯${NC}"
     echo -e ""
     echo -ne "Select From Options [ 1 - 5 ] : "
-    read botch
+    read -r botch
+
     case "$botch" in
-    1)
-        clear
-        setup_bot
-        ;;
-    2)
-        clear
-        autoBackup
-        ;;
-    3)
-        clear
-        botBackup
-        ;;
-    4)
-        clear
-        restoreBot
-        ;;
-    5)
-        menu
-        ;;
-    *)
-        menu
-        ;;
+        1)
+            clear
+            setup_bot
+            ;;
+        2)
+            clear
+            autoBackup
+            ;;
+        3)
+            clear
+            botBackup
+            ;;
+        4)
+            clear
+            restoreBot
+            ;;
+        5)
+            menu
+            ;;
+        *)
+            menu
+            ;;
     esac
 }
+
+# =========================
+# INIT CONFIG BOT
+# =========================
 clear
-[[ ! -f /root/.bckupbot ]] && {
+
+if [[ ! -f /root/.bckupbot ]]; then
     echo "Please Input Bot Details First"
     sleep 2
     clear
-    read -p "Bot Token : " getToken
-    read -p "Admin ID  : " adminID
+
+    read -rp "Bot Token : " getToken
+    read -rp "Admin ID  : " adminID
+
     echo "$getToken" >/root/.bckupbot
     echo "$adminID" >>/root/.bckupbot
     echo "switch off" >>/root/.bckupbot
-}
-read -t 10 -p "Backup y/n?  " directBckp
-if [ "${directBckp}" == "n" ]; then
+fi
+
+# =========================
+# DIRECT BACKUP
+# =========================
+read -t 10 -rp "Backup y/n? " directBckp
+echo ""
+
+if [[ "$directBckp" == "n" || "$directBckp" == "N" ]]; then
     botbckpBot_menu
 else
     botBackup
